@@ -45,9 +45,9 @@ export function Events() {
               More events coming soon. Follow us on Instagram for updates.
             </motion.li>
           ) : events.map((event) => (
-            <motion.li key={event.id} variants={card} className="w-[390px] flex-shrink-0 sm:w-[460px]">
+            <motion.li key={event.id} variants={card} className="w-[420px] flex-shrink-0 sm:w-[500px]">
               <div className="group flex h-full flex-col overflow-hidden rounded-2xl border border-western-slate/10 bg-white shadow-sm transition hover:border-western-green/30 hover:shadow-lg">
-                <div className="h-96 overflow-hidden bg-gradient-to-br from-western-green/20 to-western-greenLight/10">
+                <div className="h-[28rem] overflow-hidden bg-gradient-to-br from-western-green/20 to-western-greenLight/10 sm:h-[30rem]">
                   {event.imageUrl ? (
                     <img
                       src={event.imageUrl}

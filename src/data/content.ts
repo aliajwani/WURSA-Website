@@ -2,7 +2,7 @@
 
 export const siteConfig = {
   clubName: 'Western URSA',
-  fullName: 'Western Undergraduate Research Students Association',
+  fullName: "Western Undergraduate Research Students' Association",
   tagline: 'Empowering Research at Western',
   contactEmail: 'research@westernusc.ca',
   instagram: 'https://www.instagram.com/westernursa',

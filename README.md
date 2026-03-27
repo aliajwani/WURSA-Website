@@ -1,6 +1,6 @@
 # WURSA Website
 
-Modern, clean website for the **Western University Research Students Association (WURSA)** at Western University, London, Ontario.
+Modern, clean website for the **Western Undergraduate Research Students' Association (WURSA)** at Western University, London, Ontario.
 
 ## Stack
 
