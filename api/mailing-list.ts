@@ -1,6 +1,6 @@
 import type { IncomingMessage, ServerResponse } from 'http'
 import crypto from 'crypto'
-import { db, initDb } from './_db'
+import { db, initDb } from './_db.js'
 
 function readBody(req: IncomingMessage): Promise<any> {
   return new Promise((resolve, reject) => {

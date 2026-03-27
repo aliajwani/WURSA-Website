@@ -1,5 +1,5 @@
 import type { IncomingMessage, ServerResponse } from 'http'
-import { initDb } from './_db'
+import { initDb } from './_db.js'
 
 export default async function handler(_req: IncomingMessage, res: ServerResponse) {
   await initDb()

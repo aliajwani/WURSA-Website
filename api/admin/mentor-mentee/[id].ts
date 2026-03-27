@@ -1,6 +1,6 @@
 import type { IncomingMessage, ServerResponse } from 'http'
-import { db, initDb } from '../../../_db'
-import { requireAdmin } from '../../../_auth'
+import { db, initDb } from '../../../_db.js'
+import { requireAdmin } from '../../../_auth.js'
 
 function getIdFromUrl(url?: string) {
   if (!url) return null
