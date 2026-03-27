@@ -1,0 +1,75 @@
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&family=Outfit:wght@400;500;600;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  @apply font-sans text-western-slate antialiased;
+}
+
+.wursa-cursor {
+  position: fixed;
+  left: 0;
+  top: 0;
+  width: 18px;
+  height: 18px;
+  border-radius: 999px;
+  border: 1.5px solid rgba(107, 171, 60, 0.8);
+  background: radial-gradient(circle at 30% 30%, rgba(107, 171, 60, 0.35), rgba(27, 94, 63, 0.1));
+  pointer-events: none;
+  transform: translate3d(-100px, -100px, 0);
+  transition: background 150ms ease-out, border-color 150ms ease-out;
+  z-index: 50;
+  mix-blend-mode: multiply;
+}
+
+.wursa-cursor.wursa-cursor--active {
+  border-color: rgba(107, 171, 60, 1);
+  background: radial-gradient(circle at 30% 30%, rgba(107, 171, 60, 0.6), rgba(27, 94, 63, 0.2));
+}
+
+body {
+  cursor: none;
+}
+
+button,
+a,
+input,
+textarea,
+select {
+  cursor: none;
+}
+
+@media (pointer: coarse) {
+  body,
+  button,
+  a,
+  input,
+  textarea,
+  select {
+    cursor: auto;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .wursa-cursor {
+    display: none;
+  }
+}
+
+/* Nav link hover — green */
+header nav a:hover {
+  color: #1B5E3F !important;
+}
+
+/* Reduce motion for users who prefer it */
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+}
