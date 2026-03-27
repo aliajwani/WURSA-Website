@@ -1,0 +1,7 @@
+node_modules/
+dist/
+tsconfig.tsbuildinfo
+.env
+
+# Local submission data (production uses Postgres)
+data/*.json

@@ -40,6 +40,20 @@ npm run build
 
 Output is in `dist/`. Deploy that folder to any static host (Vercel, Netlify, GitHub Pages, etc.).
 
+## Backend environment
+
+Submission APIs now use PostgreSQL (no local JSON storage in production).
+
+Required server env vars:
+
+- `DATABASE_URL`
+- `ADMIN_USER`
+- `ADMIN_PASS`
+
+Optional:
+
+- `PGSSL` (defaults to SSL enabled in production)
+
 ## Features
 
 - Sticky navbar with mobile hamburger menu

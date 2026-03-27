@@ -1,10 +1,7 @@
 import 'dotenv/config'
 import express from 'express'
-import { promises as fs } from 'fs'
-import path from 'path'
-import { fileURLToPath } from 'url'
 import crypto from 'crypto'
-import nodemailer from 'nodemailer'
+import { Pool } from 'pg'
 
 type MentorMenteeRole = 'mentor' | 'mentee'
 
@@ -20,27 +17,6 @@ export type MentorMenteeSubmission = {
   additional?: string
 }
 
-const __dirname = path.dirname(fileURLToPath(import.meta.url))
-const DATA_DIR = path.resolve(__dirname, '../data')
-const SUBMISSIONS_PATH = path.resolve(DATA_DIR, 'mentor-mentee-submissions.json')
-const MAILING_LIST_PATH = path.resolve(DATA_DIR, 'mailing-list.json')
-
-async function readSubmissions(): Promise<MentorMenteeSubmission[]> {
-  try {
-    const raw = await fs.readFile(SUBMISSIONS_PATH, 'utf8')
-    const parsed = JSON.parse(raw)
-    return Array.isArray(parsed) ? (parsed as MentorMenteeSubmission[]) : []
-  } catch (err: any) {
-    if (err?.code === 'ENOENT') return []
-    throw err
-  }
-}
-
-async function writeSubmissions(submissions: MentorMenteeSubmission[]) {
-  await fs.mkdir(DATA_DIR, { recursive: true })
-  await fs.writeFile(SUBMISSIONS_PATH, JSON.stringify(submissions, null, 2), 'utf8')
-}
-
 type MailingListEntry = {
   id: string
   createdAt: string
@@ -48,79 +24,104 @@ type MailingListEntry = {
   email: string
 }
 
-const ALERT_EMAIL = process.env.ALERT_EMAIL ?? 'aajwani2@uwo.ca'
-const SMTP_HOST = process.env.SMTP_HOST
-const SMTP_PORT = Number(process.env.SMTP_PORT ?? 587)
-const SMTP_SECURE = process.env.SMTP_SECURE === 'true'
-const SMTP_USER = process.env.SMTP_USER
-const SMTP_PASS = process.env.SMTP_PASS
-const FROM_EMAIL = process.env.FROM_EMAIL ?? SMTP_USER ?? ALERT_EMAIL
-
-const mailer =
-  SMTP_HOST && SMTP_USER && SMTP_PASS
-    ? nodemailer.createTransport({
-        host: SMTP_HOST,
-        port: SMTP_PORT,
-        secure: SMTP_SECURE,
-        auth: { user: SMTP_USER, pass: SMTP_PASS },
-      })
-    : null
-
-async function readMailingList(): Promise<MailingListEntry[]> {
-  try {
-    const raw = await fs.readFile(MAILING_LIST_PATH, 'utf8')
-    const parsed = JSON.parse(raw)
-    return Array.isArray(parsed) ? (parsed as MailingListEntry[]) : []
-  } catch (err: any) {
-    if (err?.code === 'ENOENT') return []
-    throw err
-  }
+const databaseUrl = process.env.DATABASE_URL
+if (!databaseUrl) {
+  throw new Error('DATABASE_URL is required for production-safe submission storage.')
 }
 
-async function writeMailingList(entries: MailingListEntry[]) {
-  await fs.mkdir(DATA_DIR, { recursive: true })
-  await fs.writeFile(MAILING_LIST_PATH, JSON.stringify(entries, null, 2), 'utf8')
+const pool = new Pool({
+  connectionString: databaseUrl,
+  ssl:
+    process.env.PGSSL === 'false'
+      ? false
+      : process.env.NODE_ENV === 'production'
+        ? { rejectUnauthorized: false }
+        : false,
+})
+
+async function initDb() {
+  await pool.query(`
+    CREATE TABLE IF NOT EXISTS mentor_mentee_submissions (
+      id TEXT PRIMARY KEY,
+      created_at TIMESTAMPTZ NOT NULL,
+      role TEXT NOT NULL CHECK (role IN ('mentor', 'mentee')),
+      name TEXT NOT NULL,
+      email TEXT NOT NULL,
+      program TEXT,
+      year TEXT,
+      interests TEXT,
+      additional TEXT
+    );
+  `)
+
+  await pool.query(`
+    CREATE TABLE IF NOT EXISTS mailing_list_entries (
+      id TEXT PRIMARY KEY,
+      created_at TIMESTAMPTZ NOT NULL,
+      email TEXT NOT NULL,
+      name TEXT
+    );
+  `)
 }
 
-async function sendMentorMenteeAlert(submission: MentorMenteeSubmission) {
-  if (!mailer) return
-  await mailer.sendMail({
-    from: FROM_EMAIL,
-    to: ALERT_EMAIL,
-    subject: `New mentor-mentee submission: ${submission.name}`,
-    text: [
-      'New mentor-mentee submission received:',
-      '',
-      `Time: ${submission.createdAt}`,
-      `Role: ${submission.role}`,
-      `Name: ${submission.name}`,
-      `Email: ${submission.email}`,
-      `Program: ${submission.program ?? '-'}`,
-      `Year: ${submission.year ?? '-'}`,
-      `Interests: ${submission.interests ?? '-'}`,
-      `Additional: ${submission.additional ?? '-'}`,
-      '',
-      `ID: ${submission.id}`,
-    ].join('\n'),
-  })
+async function readSubmissions(): Promise<MentorMenteeSubmission[]> {
+  const { rows } = await pool.query(
+    `
+      SELECT id, created_at, role, name, email, program, year, interests, additional
+      FROM mentor_mentee_submissions
+      ORDER BY created_at DESC;
+    `,
+  )
+
+  return rows.map((row) => ({
+    id: row.id as string,
+    createdAt: new Date(row.created_at as string | Date).toISOString(),
+    role: row.role as MentorMenteeRole,
+    name: row.name as string,
+    email: row.email as string,
+    program: (row.program as string | null) ?? undefined,
+    year: (row.year as string | null) ?? undefined,
+    interests: (row.interests as string | null) ?? undefined,
+    additional: (row.additional as string | null) ?? undefined,
+  }))
 }
 
-async function sendMailingListAlert(entry: MailingListEntry) {
-  if (!mailer) return
-  await mailer.sendMail({
-    from: FROM_EMAIL,
-    to: ALERT_EMAIL,
-    subject: `New mailing list signup: ${entry.email}`,
-    text: [
-      'New mailing list signup received:',
-      '',
-      `Time: ${entry.createdAt}`,
-      `Email: ${entry.email}`,
-      `Name: ${entry.name ?? '-'}`,
-      '',
-      `ID: ${entry.id}`,
-    ].join('\n'),
-  })
+async function createSubmission(submission: MentorMenteeSubmission) {
+  await pool.query(
+    `
+      INSERT INTO mentor_mentee_submissions
+      (id, created_at, role, name, email, program, year, interests, additional)
+      VALUES
+      ($1, $2, $3, $4, $5, $6, $7, $8, $9);
+    `,
+    [
+      submission.id,
+      submission.createdAt,
+      submission.role,
+      submission.name,
+      submission.email,
+      submission.program ?? null,
+      submission.year ?? null,
+      submission.interests ?? null,
+      submission.additional ?? null,
+    ],
+  )
+}
+
+async function deleteSubmission(id: string) {
+  await pool.query('DELETE FROM mentor_mentee_submissions WHERE id = $1;', [id])
+}
+
+async function createMailingListEntry(entry: MailingListEntry) {
+  await pool.query(
+    `
+      INSERT INTO mailing_list_entries
+      (id, created_at, email, name)
+      VALUES
+      ($1, $2, $3, $4);
+    `,
+    [entry.id, entry.createdAt, entry.email, entry.name ?? null],
+  )
 }
 
 function requireAdmin(req: express.Request, res: express.Response, next: express.NextFunction) {
@@ -151,7 +152,7 @@ app.disable('x-powered-by')
 app.use(express.json({ limit: '256kb' }))
 
 app.get('/api/health', (_req, res) => {
-  res.json({ ok: true })
+  res.json({ ok: true, storage: 'postgres' })
 })
 
 app.post('/api/mentor-mentee', async (req, res) => {
@@ -181,16 +182,7 @@ app.post('/api/mentor-mentee', async (req, res) => {
     additional: typeof req.body?.additional === 'string' ? req.body.additional.trim() : undefined,
   }
 
-  const submissions = await readSubmissions()
-  submissions.unshift(submission)
-  await writeSubmissions(submissions)
-
-  try {
-    await sendMentorMenteeAlert(submission)
-  } catch (err) {
-    // eslint-disable-next-line no-console
-    console.error('Failed to send mentor-mentee alert email', err)
-  }
+  await createSubmission(submission)
 
   return res.status(201).json({ ok: true, id: submission.id })
 })
@@ -210,16 +202,7 @@ app.post('/api/mailing-list', async (req, res) => {
     name: typeof name === 'string' && name.trim().length ? name.trim() : undefined,
   }
 
-  const current = await readMailingList()
-  current.unshift(entry)
-  await writeMailingList(current)
-
-  try {
-    await sendMailingListAlert(entry)
-  } catch (err) {
-    // eslint-disable-next-line no-console
-    console.error('Failed to send mailing list alert email', err)
-  }
+  await createMailingListEntry(entry)
 
   return res.status(201).json({ ok: true, id: entry.id })
 })
@@ -231,22 +214,22 @@ app.get('/api/admin/mentor-mentee', requireAdmin, async (_req, res) => {
 
 app.delete('/api/admin/mentor-mentee/:id', requireAdmin, async (req, res) => {
   const id = req.params.id
-  const submissions = await readSubmissions()
-  const next = submissions.filter((s) => s.id !== id)
-  await writeSubmissions(next)
+  await deleteSubmission(id)
   res.json({ ok: true })
 })
 
 const port = Number(process.env.PORT ?? 5174)
-app.listen(port, () => {
+async function start() {
+  await initDb()
+  app.listen(port, () => {
+    // eslint-disable-next-line no-console
+    console.log(`API server listening on http://localhost:${port}`)
+  })
+}
+
+start().catch((err) => {
   // eslint-disable-next-line no-console
-  console.log(`API server listening on http://localhost:${port}`)
-  if (!mailer) {
-    // eslint-disable-next-line no-console
-    console.warn('Email alerts disabled: set SMTP_HOST, SMTP_USER, and SMTP_PASS in environment.')
-  } else {
-    // eslint-disable-next-line no-console
-    console.log(`Email alerts enabled. Alert recipient: ${ALERT_EMAIL}`)
-  }
+  console.error('Failed to start API server', err)
+  process.exit(1)
 })
 
