@@ -180,11 +180,13 @@ export function MentorMenteePage() {
                   className="mt-2 block w-full rounded-lg border border-western-slate/20 bg-white px-4 py-2.5 text-western-slate shadow-sm focus:border-[#1B5E3F] focus:outline-none focus:ring-1 focus:ring-[#1B5E3F]"
                 >
                   <option value="">Select year</option>
-                  <option value="1">First year</option>
-                  <option value="2">Second year</option>
-                  <option value="3">Third year</option>
-                  <option value="4">Fourth year</option>
-                  <option value="5+">Fifth year or more</option>
+                  <option value="1">Undergraduate – First year</option>
+                  <option value="2">Undergraduate – Second year</option>
+                  <option value="3">Undergraduate – Third year</option>
+                  <option value="4">Undergraduate – Fourth year</option>
+                  <option value="5+">Undergraduate – Fifth year or more</option>
+                  <option value="masters">Master&apos;s</option>
+                  <option value="phd">PhD</option>
                 </select>
               </div>
 

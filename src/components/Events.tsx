@@ -34,7 +34,7 @@ export function Events() {
         </motion.div>
 
         <motion.ul
-          className="mt-12 flex justify-center gap-8 overflow-x-auto pb-3 lg:flex-wrap lg:overflow-visible [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+          className="mt-12 flex justify-start gap-8 overflow-x-auto pb-3 lg:justify-center lg:flex-wrap lg:overflow-visible [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
           variants={container}
           initial="hidden"
           whileInView="show"
