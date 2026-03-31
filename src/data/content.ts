@@ -76,7 +76,7 @@ export const events: EventItem[] = [
     date: 'April 2nd, 2026',
     description: 'Explore research opportunities and connect with peers and faculty at our annual symposium.',
     imageUrl: '/event-symposium.png',
-    link: '#',
+    link: 'https://forms.gle/6N83EmCLcjP6nvii7',
   },
 ]
 
