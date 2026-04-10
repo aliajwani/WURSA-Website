@@ -74,7 +74,7 @@ export function Events() {
                   </p>
                   <div className="mt-4 flex-1" />
                   <div className="mt-4">
-                    {event.id === '2' ? (
+                    {event.registrationClosed ? (
                       <div className="group/finished relative">
                         <button
                           type="button"

@@ -59,6 +59,8 @@ export interface EventItem {
   description: string
   imageUrl?: string
   link?: string
+  /** When true, Register is greyed out with “event finished” tooltip (no link). */
+  registrationClosed?: boolean
 }
 
 export const events: EventItem[] = [
@@ -69,6 +71,7 @@ export const events: EventItem[] = [
     description: 'Get professional LinkedIn headshots taken on campus to level up your research profile.',
     imageUrl: '/event-headshots.png',
     link: '#',
+    registrationClosed: true,
   },
   {
     id: '1',
@@ -76,7 +79,7 @@ export const events: EventItem[] = [
     date: 'April 2nd, 2026',
     description: 'Explore research opportunities and connect with peers and faculty at our annual symposium.',
     imageUrl: '/event-symposium.png',
-    link: 'https://forms.gle/6N83EmCLcjP6nvii7',
+    registrationClosed: true,
   },
 ]
 
