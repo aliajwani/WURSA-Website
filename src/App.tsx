@@ -28,7 +28,7 @@ function App() {
               <>
                 <Hero />
                 <About />
-                <Events />
+                <Events limit={2} />
                 <Blog preview />
                 <GetInvolved />
                 <Footer />

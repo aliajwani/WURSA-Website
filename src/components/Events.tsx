@@ -1,3 +1,4 @@
+import { Link } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import { events } from '@/data/content'
 
@@ -14,7 +15,10 @@ const card = {
   show: { opacity: 1, y: 0 },
 }
 
-export function Events() {
+/** Pass `limit` on the homepage to show only the newest few events plus a "View all" link. */
+export function Events({ limit }: { limit?: number }) {
+  const shown = limit ? events.slice(0, limit) : events
+
   return (
     <section id="events" className="bg-white px-6 pt-12 pb-20 lg:px-8 lg:pt-16 lg:pb-28">
       <div className="mx-auto w-full max-w-[1400px]">
@@ -40,11 +44,11 @@ export function Events() {
           whileInView="show"
           viewport={{ once: true, margin: '-60px' }}
         >
-          {events.length === 0 ? (
+          {shown.length === 0 ? (
             <motion.li variants={card} className="col-span-full text-center py-12 text-western-slate/70">
               More events coming soon. Follow us on Instagram for updates.
             </motion.li>
-          ) : events.map((event) => (
+          ) : shown.map((event) => (
             <motion.li key={event.id} variants={card} className="w-[420px] flex-shrink-0 sm:w-[500px]">
               <div className="group flex h-full flex-col overflow-hidden rounded-2xl border border-western-slate/10 bg-white shadow-sm transition hover:border-western-green/30 hover:shadow-lg">
                 <div className="h-[28rem] overflow-hidden bg-gradient-to-br from-western-green/20 to-western-greenLight/10 sm:h-[30rem]">
@@ -117,6 +121,20 @@ export function Events() {
             </motion.li>
           ))}
         </motion.ul>
+
+        {limit && events.length > limit && (
+          <div className="mt-12 text-center">
+            <Link
+              to="/events"
+              className="inline-flex items-center gap-2 rounded-lg bg-[#1B5E3F] px-6 py-3 text-sm font-semibold text-white shadow-sm transition hover:bg-[#0D3B2A]"
+            >
+              View all events
+              <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
+              </svg>
+            </Link>
+          </div>
+        )}
       </div>
     </section>
   )
