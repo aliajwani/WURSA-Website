@@ -12,10 +12,12 @@ import { TeamPage } from '@/pages/TeamPage'
 import { EventsPage } from '@/pages/EventsPage'
 import { BlogPage } from '@/pages/BlogPage'
 import { CustomCursor } from '@/components/CustomCursor'
+import { ScrollToTop } from '@/components/ScrollToTop'
 
 function App() {
   return (
     <>
+      <ScrollToTop />
       <CustomCursor />
       <Navbar />
       <main>
