@@ -60,19 +60,31 @@ export interface EventItem {
   date: string
   description: string
   imageUrl?: string
+  /** CSS object-position for the card image, e.g. 'center 70%' to show more of the bottom */
+  imagePosition?: string
   link?: string
   /** When true, Register is greyed out with “event finished” tooltip (no link). */
   registrationClosed?: boolean
 }
 
+// Newest first
 export const events: EventItem[] = [
   {
-    id: '2',
-    title: 'LinkedIn Headshots Day',
-    date: 'March 11th, 2026',
-    description: 'Get professional LinkedIn headshots taken on campus to level up your research profile.',
-    imageUrl: '/event-headshots.png',
-    link: '#',
+    id: '4',
+    title: 'Intro to Research 101 Workshop',
+    date: 'November 18th, 2026',
+    description: 'A beginner-friendly workshop on how research works, from finding opportunities to reading papers and reaching out to labs.',
+    imageUrl: '/event-research-101.jpg',
+    imagePosition: 'center 70%',
+    registrationClosed: true,
+  },
+  {
+    id: '3',
+    title: 'Annual General Meeting',
+    date: 'October 28th, 2026',
+    description: "Our yearly AGM, where we looked back on the past year, voted on club business and shared what's coming next for Western URSA.",
+    imageUrl: '/event-agm.jpg',
+    imagePosition: 'center 70%',
     registrationClosed: true,
   },
   {
@@ -81,6 +93,15 @@ export const events: EventItem[] = [
     date: 'April 2nd, 2026',
     description: 'Explore research opportunities and connect with peers and faculty at our annual symposium.',
     imageUrl: '/event-symposium.png',
+    registrationClosed: true,
+  },
+  {
+    id: '2',
+    title: 'LinkedIn Headshots Day',
+    date: 'March 11th, 2026',
+    description: 'Get professional LinkedIn headshots taken on campus to level up your research profile.',
+    imageUrl: '/event-headshots.png',
+    link: '#',
     registrationClosed: true,
   },
 ]

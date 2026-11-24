@@ -53,6 +53,7 @@ export function Events() {
                       src={event.imageUrl}
                       alt={event.title}
                       className="h-full w-full object-cover object-center transition duration-300 group-hover:scale-105"
+                      style={event.imagePosition ? { objectPosition: event.imagePosition } : undefined}
                     />
                   ) : (
                     <div className="flex h-full w-full items-center justify-center">
