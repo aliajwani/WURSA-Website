@@ -6,6 +6,7 @@ export const siteConfig = {
   tagline: 'Empowering Research at Western',
   contactEmail: 'research@westernusc.ca',
   instagram: 'https://www.instagram.com/westernursa',
+  substack: 'https://westernursa.substack.com',
   linktree:
     'https://linktr.ee/westernursa?utm_source=ig&utm_medium=social&utm_content=link_in_bio&fbclid=PAZXh0bgNhZW0CMTEAc3J0YwZhcHBfaWQMMjU2MjgxMDQwNTU4AAGne_TUFBqX5UxAr27KlEzMecHSTk-P4X9_qSEP5Yo0Agzh69lYVHcPokjWzsw_aem_xu8uLRIj4uMbSFWOusvZSg',
 }
@@ -14,6 +15,7 @@ export const navLinks = [
   { label: 'Home', href: '/#hero' },
   { label: 'Events', href: '/events' },
   { label: 'Team', href: '/team' },
+  { label: 'Blog', href: '/blog' },
   { label: 'Mentor–Mentee', href: '/mentor-mentee' },
 ]
 
@@ -159,3 +161,36 @@ export const getInvolvedContent = {
   ctaLabel: 'Get Involved',
   ctaHref: 'mailto:research@westernusc.ca',
 }
+
+export interface BlogPost {
+  id: string
+  title: string
+  /** Display date, e.g. 'November 12th, 2026' */
+  date: string
+  excerpt: string
+  /** Link to the full post on Substack */
+  url: string
+  author?: string
+  /** Short label shown as a pill, e.g. 'Research Spotlight' */
+  tag?: string
+  readTime?: string
+  /** Cover image – a /public path or the Substack image URL */
+  imageUrl?: string
+}
+
+// Newest first. The first post is shown as the big featured card.
+export const blogPosts: BlogPost[] = [
+  {
+    id: '1',
+    title: 'Can a Simple Blood Test Predict Heart Disease?',
+    date: 'November 22nd, 2026',
+    excerpt:
+      'A new study of over 15,000 people looked at whether combining three blood biomarkers, LDL cholesterol, Lp(a) and hsCRP, could help flag cardiovascular risk before any symptoms show up.',
+    url: 'https://westernursa.substack.com/p/can-a-simple-blood-test-predict-heart',
+    author: 'Hansi Sharma & Kennedy Khounthammarath',
+    tag: 'Research Blog',
+    readTime: '3 min read',
+    imageUrl:
+      'https://substack-post-media.s3.amazonaws.com/public/images/2f2bd03b-5e93-4271-a536-635eb7e161b8_1184x782.png',
+  },
+]
